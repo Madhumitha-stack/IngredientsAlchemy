@@ -28,9 +28,237 @@ const ingredientsCountElement = document.getElementById('ingredients-count');
 const timeSavedElement = document.getElementById('time-saved');
 const savedCountElement = document.getElementById('saved-count');
 
-// Spoonacular API Configuration
-const SPOONACULAR_API_KEY = 'c989a4744a214323a999204c4ab2326c';
-const SPOONACULAR_BASE_URL = 'https://api.spoonacular.com/recipes';
+// MULTIPLE API OPTIONS - Try different sources
+const API_SOURCES = {
+    SPOONACULAR: {
+        name: 'Spoonacular',
+        keys: [
+            'f3da4879180b461090ef428a689a7101',
+            'b2c54f72bb2845c4a0c891c76b3e6a7a',
+            '9c14c8777c8f4c6a8c45a7a7d3c3b2a5'
+        ],
+        baseUrl: 'https://api.spoonacular.com/recipes',
+        currentKeyIndex: 0
+    },
+    THEMEALDB: {
+        name: 'TheMealDB',
+        baseUrl: 'https://www.themealdb.com/api/json/v1/1'
+    }
+};
+
+// COMPREHENSIVE DEMO RECIPE DATABASE
+const DEMO_RECIPES = [
+    // Potato Recipes
+    {
+        id: 1001,
+        title: "Crispy Roasted Potatoes",
+        image: "https://images.unsplash.com/photo-1572451479130-6d57d90c6c7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+        time: 45,
+        servings: 4,
+        difficulty: 'easy',
+        ingredients: ["potatoes", "olive oil", "garlic", "rosemary", "salt", "black pepper", "paprika"],
+        instructions: "1. Preheat oven to 425°F (220°C)\n2. Cut potatoes into wedges or cubes\n3. Toss with olive oil, minced garlic, and seasonings\n4. Spread on baking sheet in single layer\n5. Roast for 35-40 minutes until golden and crispy\n6. Toss halfway through cooking\n7. Garnish with fresh rosemary before serving",
+        summary: "Perfectly crispy roasted potatoes with garlic and herbs.",
+        source: "Demo Recipes",
+        tags: ["potato", "side dish", "vegetarian", "easy"]
+    },
+    {
+        id: 1002,
+        title: "Creamy Mashed Potatoes",
+        image: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+        time: 30,
+        servings: 6,
+        difficulty: 'easy',
+        ingredients: ["potatoes", "butter", "milk", "garlic", "salt", "pepper", "parmesan cheese"],
+        instructions: "1. Peel and quarter potatoes\n2. Boil in salted water until tender (15-20 minutes)\n3. Heat milk and butter in saucepan\n4. Drain potatoes and mash\n5. Gradually add warm milk mixture\n6. Stir in minced garlic and seasonings\n7. Fold in grated parmesan until creamy",
+        summary: "Ultra-creamy mashed potatoes perfect for any meal.",
+        source: "Demo Recipes",
+        tags: ["potato", "comfort food", "vegetarian", "creamy"]
+    },
+    {
+        id: 1003,
+        title: "Potato and Leek Soup",
+        image: "https://images.unsplash.com/photo-1547592166-23ac45744acd?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+        time: 40,
+        servings: 4,
+        difficulty: 'easy',
+        ingredients: ["potatoes", "leeks", "onion", "garlic", "vegetable broth", "cream", "thyme", "butter"],
+        instructions: "1. Sauté chopped leeks and onion in butter\n2. Add minced garlic and cook for 1 minute\n3. Add diced potatoes and vegetable broth\n4. Simmer until potatoes are tender (20 minutes)\n5. Blend soup until smooth\n6. Stir in cream and fresh thyme\n7. Season with salt and pepper to taste",
+        summary: "Creamy and comforting potato leek soup.",
+        source: "Demo Recipes",
+        tags: ["potato", "soup", "vegetarian", "comfort food"]
+    },
+    {
+        id: 1004,
+        title: "Spanish Potato Omelette",
+        image: "https://images.unsplash.com/photo-1595257842037-ee574c1bd2bf?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+        time: 35,
+        servings: 4,
+        difficulty: 'medium',
+        ingredients: ["potatoes", "eggs", "onion", "olive oil", "salt", "pepper", "parsley"],
+        instructions: "1. Thinly slice potatoes and onions\n2. Fry in olive oil until tender but not brown\n3. Beat eggs with salt and pepper\n4. Combine potatoes and onions with eggs\n5. Cook in skillet over medium heat\n6. Flip and cook other side until golden\n7. Garnish with fresh parsley",
+        summary: "Classic Spanish tortilla with potatoes and eggs.",
+        source: "Demo Recipes",
+        tags: ["potato", "spanish", "vegetarian", "breakfast"]
+    },
+
+    // Chicken Recipes
+    {
+        id: 2001,
+        title: "Garlic Butter Chicken",
+        image: "https://images.unsplash.com/photo-1604503468506-a8da13d82791?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+        time: 25,
+        servings: 4,
+        difficulty: 'easy',
+        ingredients: ["chicken breast", "garlic", "butter", "olive oil", "thyme", "lemon juice", "chicken broth"],
+        instructions: "1. Season chicken with salt and pepper\n2. Heat olive oil in a large skillet\n3. Cook chicken for 6-7 minutes per side\n4. Add butter, minced garlic, and thyme\n5. Cook for 2 more minutes, basting chicken\n6. Add lemon juice and chicken broth\n7. Simmer until sauce thickens slightly",
+        summary: "Juicy chicken breasts in rich garlic butter sauce.",
+        source: "Demo Recipes",
+        tags: ["chicken", "quick", "gluten-free", "high-protein"]
+    },
+    {
+        id: 2002,
+        title: "Creamy Chicken Pasta",
+        image: "https://images.unsplash.com/photo-1563379926898-05f4575a45d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+        time: 35,
+        servings: 4,
+        difficulty: 'medium',
+        ingredients: ["chicken breast", "pasta", "heavy cream", "parmesan cheese", "garlic", "mushrooms", "butter", "flour"],
+        instructions: "1. Cook pasta according to package directions\n2. Dice chicken and cook until golden\n3. Sauté mushrooms and garlic in butter\n4. Sprinkle flour and cook for 1 minute\n5. Gradually add cream and chicken broth\n6. Add grated parmesan and cooked chicken\n7. Combine sauce with pasta and serve",
+        summary: "Rich and creamy pasta with tender chicken.",
+        source: "Demo Recipes",
+        tags: ["chicken", "pasta", "creamy", "comfort food"]
+    },
+
+    // Tomato Recipes
+    {
+        id: 3001,
+        title: "Fresh Tomato Bruschetta",
+        image: "https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+        time: 15,
+        servings: 4,
+        difficulty: 'easy',
+        ingredients: ["tomatoes", "baguette", "garlic", "fresh basil", "olive oil", "balsamic vinegar", "salt"],
+        instructions: "1. Dice tomatoes and place in bowl\n2. Chop fresh basil and add to tomatoes\n3. Mix with olive oil and balsamic vinegar\n4. Season with salt and pepper\n5. Toast baguette slices until golden\n6. Rub with garlic clove\n7. Top with tomato mixture and serve",
+        summary: "Classic Italian appetizer with fresh tomatoes.",
+        source: "Demo Recipes",
+        tags: ["tomato", "appetizer", "vegetarian", "quick"]
+    },
+    {
+        id: 3002,
+        title: "Tomato Basil Soup",
+        image: "https://images.unsplash.com/photo-1547592166-23ac45744acd?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+        time: 30,
+        servings: 4,
+        difficulty: 'easy',
+        ingredients: ["tomatoes", "onion", "garlic", "vegetable broth", "fresh basil", "cream", "olive oil"],
+        instructions: "1. Sauté chopped onions and garlic\n2. Add chopped tomatoes and cook\n3. Pour in vegetable broth and simmer\n4. Blend soup with fresh basil\n5. Stir in cream and season\n6. Serve hot with crusty bread",
+        summary: "Creamy tomato soup with fresh basil.",
+        source: "Demo Recipes",
+        tags: ["tomato", "soup", "vegetarian", "comfort food"]
+    },
+
+    // Cheese Recipes
+    {
+        id: 4001,
+        title: "Three Cheese Pasta Bake",
+        image: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+        time: 45,
+        servings: 6,
+        difficulty: 'medium',
+        ingredients: ["pasta", "mozzarella", "parmesan", "ricotta", "tomato sauce", "garlic", "basil"],
+        instructions: "1. Cook pasta until al dente\n2. Mix ricotta with garlic and basil\n3. Layer pasta, sauce, and cheese mixture\n4. Top with mozzarella and parmesan\n5. Bake until bubbly and golden\n6. Let rest before serving",
+        summary: "Hearty pasta bake with three cheeses.",
+        source: "Demo Recipes",
+        tags: ["cheese", "pasta", "vegetarian", "baked"]
+    },
+    {
+        id: 4002,
+        title: "Caprese Salad",
+        image: "https://images.unsplash.com/photo-1563379926898-05f4575a45d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+        time: 10,
+        servings: 2,
+        difficulty: 'easy',
+        ingredients: ["mozzarella cheese", "tomatoes", "fresh basil", "olive oil", "balsamic glaze"],
+        instructions: "1. Slice tomatoes and mozzarella\n2. Arrange alternating slices\n3. Add fresh basil leaves\n4. Drizzle with olive oil\n5. Add balsamic glaze\n6. Season with salt and pepper",
+        summary: "Simple salad with mozzarella and tomatoes.",
+        source: "Demo Recipes",
+        tags: ["cheese", "salad", "vegetarian", "quick"]
+    },
+
+    // Vegetable Recipes
+    {
+        id: 5001,
+        title: "Roasted Vegetable Medley",
+        image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+        time: 35,
+        servings: 4,
+        difficulty: 'easy',
+        ingredients: ["potatoes", "carrots", "bell peppers", "zucchini", "onion", "garlic", "olive oil", "herbs"],
+        instructions: "1. Preheat oven to 400°F\n2. Chop all vegetables into similar sizes\n3. Toss with olive oil and seasonings\n4. Spread on baking sheet\n5. Roast for 25-30 minutes\n6. Toss halfway through cooking\n7. Serve hot as side dish",
+        summary: "Colorful roasted vegetable mixture.",
+        source: "Demo Recipes",
+        tags: ["vegetable", "side dish", "vegetarian", "healthy"]
+    },
+    {
+        id: 5002,
+        title: "Vegetable Stir Fry",
+        image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+        time: 20,
+        servings: 3,
+        difficulty: 'easy',
+        ingredients: ["broccoli", "carrots", "bell peppers", "snap peas", "garlic", "ginger", "soy sauce"],
+        instructions: "1. Prepare all vegetables\n2. Heat oil in wok or large pan\n3. Stir-fry garlic and ginger\n4. Add vegetables and stir-fry\n5. Add soy sauce and cook\n6. Serve over steamed rice",
+        summary: "Quick and healthy vegetable stir fry.",
+        source: "Demo Recipes",
+        tags: ["vegetable", "stir fry", "vegetarian", "asian"]
+    },
+
+    // Egg Recipes
+    {
+        id: 6001,
+        title: "Cheesy Vegetable Omelette",
+        image: "https://images.unsplash.com/photo-1595257842037-ee574c1bd2bf?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+        time: 10,
+        servings: 1,
+        difficulty: 'easy',
+        ingredients: ["eggs", "cheddar cheese", "tomato", "onion", "bell pepper", "butter", "milk"],
+        instructions: "1. Beat eggs with milk\n2. Sauté vegetables in butter\n3. Pour eggs over vegetables\n4. Add cheese and cook\n5. Fold and serve hot",
+        summary: "Protein-packed vegetable omelette.",
+        source: "Demo Recipes",
+        tags: ["egg", "breakfast", "vegetarian", "quick"]
+    },
+
+    // Beef Recipes
+    {
+        id: 7001,
+        title: "Classic Beef Tacos",
+        image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+        time: 30,
+        servings: 4,
+        difficulty: 'medium',
+        ingredients: ["ground beef", "taco shells", "tomato", "onion", "garlic", "cheese", "lettuce"],
+        instructions: "1. Brown ground beef with onions\n2. Add taco seasoning\n3. Prepare toppings\n4. Heat taco shells\n5. Assemble tacos\n6. Serve immediately",
+        summary: "Family-friendly beef tacos.",
+        source: "Demo Recipes",
+        tags: ["beef", "mexican", "main course", "family"]
+    },
+
+    // Rice Recipes
+    {
+        id: 8001,
+        title: "Vegetable Fried Rice",
+        image: "https://images.unsplash.com/photo-1563245372-f21724e3856d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+        time: 25,
+        servings: 4,
+        difficulty: 'easy',
+        ingredients: ["rice", "eggs", "carrots", "peas", "onion", "garlic", "soy sauce", "sesame oil"],
+        instructions: "1. Cook rice and let cool\n2. Scramble eggs and set aside\n3. Stir-fry vegetables\n4. Add rice and soy sauce\n5. Mix in eggs\n6. Drizzle with sesame oil",
+        summary: "Classic vegetable fried rice.",
+        source: "Demo Recipes",
+        tags: ["rice", "vegetarian", "asian", "quick"]
+    }
+];
 
 // State
 let ingredients = [];
@@ -225,7 +453,7 @@ function toggleVoiceSearch() {
 
 // Random Recipe
 randomRecipeBtn.addEventListener('click', function() {
-    ingredients = ['chicken', 'tomato', 'cheese', 'garlic', 'onion'];
+    ingredients = ['chicken', 'tomato', 'cheese', 'garlic', 'onion', 'potato'];
     renderIngredients();
     findRecipes();
     showNotification('Random ingredients added! Finding recipes...', 'success');
@@ -341,7 +569,7 @@ clearIngredientsBtn.addEventListener('click', function() {
     }
 });
 
-// Find Recipes with Spoonacular API
+// Find Recipes - IMPROVED WITH COMPREHENSIVE FALLBACK
 findRecipesBtn.addEventListener('click', findRecipes);
 
 async function findRecipes() {
@@ -353,59 +581,240 @@ async function findRecipes() {
     showLoading(true);
     
     try {
-        const ingredientsString = ingredients.join(',');
-        const apiUrl = `${SPOONACULAR_BASE_URL}/findByIngredients?ingredients=${ingredientsString}&number=12&apiKey=${SPOONACULAR_API_KEY}`;
+        console.log('Starting recipe search with ingredients:', ingredients);
         
-        const response = await fetch(apiUrl);
+        let apiRecipes = [];
+        let sourceUsed = '';
         
-        if (!response.ok) {
-            throw new Error('API request failed');
+        // Try Spoonacular first
+        try {
+            apiRecipes = await fetchSpoonacularRecipes();
+            sourceUsed = 'Spoonacular';
+        } catch (spoonacularError) {
+            console.log('Spoonacular failed, trying TheMealDB...');
+            
+            // Try TheMealDB as fallback
+            try {
+                apiRecipes = await fetchTheMealDBRecipes();
+                sourceUsed = 'TheMealDB';
+            } catch (themealdbError) {
+                console.log('TheMealDB failed, using comprehensive demo data...');
+                
+                // Use comprehensive demo data as final fallback
+                apiRecipes = generateEnhancedDemoRecipes(ingredients);
+                sourceUsed = 'Demo Recipes';
+            }
         }
         
-        const data = await response.json();
-        
-        const detailedRecipes = await Promise.all(
-            data.map(async (recipe) => {
-                const detailUrl = `${SPOONACULAR_BASE_URL}/${recipe.id}/information?apiKey=${SPOONACULAR_API_KEY}`;
-                const detailResponse = await fetch(detailUrl);
-                return detailResponse.json();
-            })
-        );
-        
-        currentRecipes = detailedRecipes.map(recipe => ({
-            id: recipe.id,
-            title: recipe.title,
-            image: recipe.image,
-            time: recipe.readyInMinutes,
-            servings: recipe.servings,
-            difficulty: getDifficulty(recipe.readyInMinutes),
-            ingredients: recipe.extendedIngredients.map(ing => ing.name.toLowerCase()),
-            instructions: recipe.instructions || 'No instructions available.',
-            summary: recipe.summary,
-            sourceUrl: recipe.sourceUrl
-        }));
-        
-        let filteredRecipes = applyAllFilters(currentRecipes);
-        
-        renderRecipes(filteredRecipes);
-        showNotification(`Found ${filteredRecipes.length} recipes!`, 'success');
-        
-        updateStats();
-        
-        document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        if (apiRecipes && apiRecipes.length > 0) {
+            currentRecipes = apiRecipes;
+            showNotification(`Found ${apiRecipes.length} recipes from ${sourceUsed}!`, 'success');
+            
+            let filteredRecipes = applyAllFilters(currentRecipes);
+            renderRecipes(filteredRecipes);
+            updateStats();
+            
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        } else {
+            currentRecipes = [];
+            renderRecipes([]);
+            updateStats();
+            showNotification('No recipes found with these ingredients. Try different ingredients!', 'warning');
+        }
         
     } catch (error) {
-        console.error('Error fetching recipes:', error);
-        showNotification('Failed to fetch recipes. Using demo data instead.', 'error');
+        console.error('Error in findRecipes:', error);
+        showNotification('Failed to fetch recipes. Using comprehensive demo recipes.', 'error');
         
-        currentRecipes = generateMockRecipes(ingredients);
+        currentRecipes = generateEnhancedDemoRecipes(ingredients);
         let filteredRecipes = applyAllFilters(currentRecipes);
-        
         renderRecipes(filteredRecipes);
         updateStats();
     } finally {
         showLoading(false);
     }
+}
+
+// Spoonacular API function with retry logic
+async function fetchSpoonacularRecipes() {
+    const maxRetries = API_SOURCES.SPOONACULAR.keys.length;
+    
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+        try {
+            const currentKey = API_SOURCES.SPOONACULAR.keys[API_SOURCES.SPOONACULAR.currentKeyIndex];
+            const ingredientsString = ingredients.join(',');
+            
+            const searchUrl = `${API_SOURCES.SPOONACULAR.baseUrl}/complexSearch?query=${ingredientsString}&number=8&apiKey=${currentKey}&addRecipeInformation=true&fillIngredients=true&instructionsRequired=true`;
+            
+            console.log(`Spoonacular attempt ${attempt + 1} with key ${API_SOURCES.SPOONACULAR.currentKeyIndex}`);
+            
+            const response = await fetch(searchUrl);
+            
+            if (response.status === 402) {
+                throw new Error('API quota exceeded');
+            }
+            
+            if (!response.ok) {
+                throw new Error(`API request failed with status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (!data.results || data.results.length === 0) {
+                return [];
+            }
+            
+            // Transform recipes
+            const recipes = data.results.map(recipe => ({
+                id: `spoonacular-${recipe.id}`,
+                title: recipe.title,
+                image: recipe.image,
+                time: recipe.readyInMinutes || 30,
+                servings: recipe.servings || 4,
+                difficulty: getDifficulty(recipe.readyInMinutes || 30),
+                ingredients: recipe.extendedIngredients ? recipe.extendedIngredients.map(ing => ing.original) : [],
+                instructions: recipe.instructions ? cleanInstructions(recipe.instructions) : 'No instructions available.',
+                summary: recipe.summary || `A delicious recipe for ${recipe.title}`,
+                sourceUrl: recipe.sourceUrl,
+                source: 'Spoonacular'
+            }));
+            
+            return recipes;
+            
+        } catch (error) {
+            console.log(`Spoonacular attempt ${attempt + 1} failed:`, error.message);
+            
+            if (attempt < maxRetries - 1) {
+                // Switch to next API key
+                API_SOURCES.SPOONACULAR.currentKeyIndex = (API_SOURCES.SPOONACULAR.currentKeyIndex + 1) % API_SOURCES.SPOONACULAR.keys.length;
+                await new Promise(resolve => setTimeout(resolve, 500));
+            } else {
+                throw new Error('All Spoonacular keys exhausted');
+            }
+        }
+    }
+}
+
+// TheMealDB API (No API key required!)
+async function fetchTheMealDBRecipes() {
+    try {
+        // TheMealDB doesn't have ingredient-based search, so we'll search by first ingredient
+        const primaryIngredient = ingredients[0];
+        const searchUrl = `${API_SOURCES.THEMEALDB.baseUrl}/filter.php?i=${primaryIngredient}`;
+        
+        console.log('Trying TheMealDB with ingredient:', primaryIngredient);
+        
+        const response = await fetch(searchUrl);
+        
+        if (!response.ok) {
+            throw new Error(`TheMealDB request failed with status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (!data.meals || data.meals.length === 0) {
+            return [];
+        }
+        
+        // Get details for each meal
+        const recipes = [];
+        for (const meal of data.meals.slice(0, 6)) {
+            try {
+                const detailUrl = `${API_SOURCES.THEMEALDB.baseUrl}/lookup.php?i=${meal.idMeal}`;
+                const detailResponse = await fetch(detailUrl);
+                
+                if (detailResponse.ok) {
+                    const detailData = await detailResponse.json();
+                    const mealDetail = detailData.meals[0];
+                    
+                    if (mealDetail) {
+                        // Extract ingredients from the meal detail
+                        const mealIngredients = [];
+                        for (let i = 1; i <= 20; i++) {
+                            const ingredient = mealDetail[`strIngredient${i}`];
+                            const measure = mealDetail[`strMeasure${i}`];
+                            if (ingredient && ingredient.trim()) {
+                                mealIngredients.push(`${measure ? measure + ' ' : ''}${ingredient}`.trim());
+                            }
+                        }
+                        
+                        recipes.push({
+                            id: `themealdb-${meal.idMeal}`,
+                            title: mealDetail.strMeal,
+                            image: mealDetail.strMealThumb,
+                            time: 45, // TheMealDB doesn't provide time
+                            servings: 4,
+                            difficulty: 'medium',
+                            ingredients: mealIngredients,
+                            instructions: mealDetail.strInstructions || 'No instructions available.',
+                            summary: `A delicious ${mealDetail.strCategory} recipe`,
+                            sourceUrl: mealDetail.strSource || mealDetail.strYoutube,
+                            source: 'TheMealDB'
+                        });
+                    }
+                }
+            } catch (error) {
+                console.warn('Failed to get meal details:', error);
+            }
+        }
+        
+        return recipes;
+        
+    } catch (error) {
+        console.error('Error fetching from TheMealDB:', error);
+        throw error;
+    }
+}
+
+// Enhanced Demo Data with comprehensive recipe matching
+function generateEnhancedDemoRecipes(userIngredients) {
+    console.log('Generating enhanced demo recipes for:', userIngredients);
+    
+    // Find recipes that match user ingredients
+    const matchingRecipes = DEMO_RECIPES.filter(recipe => {
+        const matchingIngredients = recipe.ingredients.filter(recipeIng => 
+            userIngredients.some(userIng => 
+                recipeIng.toLowerCase().includes(userIng.toLowerCase()) ||
+                userIng.toLowerCase().includes(recipeIng.toLowerCase())
+            )
+        );
+        return matchingIngredients.length > 0;
+    });
+    
+    // Sort by number of matching ingredients (most matches first)
+    matchingRecipes.sort((a, b) => {
+        const aMatches = a.ingredients.filter(ing => 
+            userIngredients.some(userIng => ing.toLowerCase().includes(userIng.toLowerCase()))
+        ).length;
+        const bMatches = b.ingredients.filter(ing => 
+            userIngredients.some(userIng => ing.toLowerCase().includes(userIng.toLowerCase()))
+        ).length;
+        return bMatches - aMatches;
+    });
+    
+    console.log('Matching recipes found:', matchingRecipes.length);
+    
+    // If no matches found, return some popular recipes
+    if (matchingRecipes.length === 0) {
+        return DEMO_RECIPES.slice(0, 6);
+    }
+    
+    return matchingRecipes.slice(0, 8);
+}
+
+// Helper function to clean HTML instructions
+function cleanInstructions(instructions) {
+    if (!instructions) return 'No instructions available.';
+    const cleanText = instructions.replace(/<[^>]*>/g, '');
+    const steps = cleanText.split('.').filter(step => step.trim().length > 0);
+    return steps.map((step, index) => `${index + 1}. ${step.trim()}`).join('\n');
+}
+
+// Helper function to determine difficulty based on cooking time
+function getDifficulty(cookingTime) {
+    if (cookingTime <= 15) return 'easy';
+    if (cookingTime <= 30) return 'medium';
+    return 'hard';
 }
 
 // Apply all filters (basic + advanced)
@@ -424,13 +833,6 @@ function applyAllFilters(recipes) {
     filteredRecipes = applyAdvancedFilters(filteredRecipes);
     
     return filteredRecipes;
-}
-
-// Helper function to determine difficulty based on cooking time
-function getDifficulty(cookingTime) {
-    if (cookingTime <= 15) return 'easy';
-    if (cookingTime <= 30) return 'medium';
-    return 'hard';
 }
 
 // Basic Filters
@@ -510,7 +912,7 @@ function initFiltersPage() {
         });
     });
     
-    // Apply filters - FIXED
+    // Apply filters
     applyFiltersBtn.addEventListener('click', function() {
         console.log('Apply filters clicked');
         
@@ -673,62 +1075,17 @@ document.getElementById('sort-recipes')?.addEventListener('change', function() {
     renderRecipes(sortedRecipes);
 });
 
-// Demo data fallback
-function generateMockRecipes(ingredients) {
-    const recipeTemplates = [
-        {
-            id: 1,
-            title: "Hearty Vegetable Stir Fry",
-            image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
-            time: 25,
-            servings: 2,
-            difficulty: 'easy',
-            ingredients: ["broccoli", "carrot", "pepper", "garlic", "onion"],
-            instructions: "1. Heat oil in a wok or large skillet over high heat.\n2. Add garlic and onion, stir-fry for 1 minute.\n3. Add remaining vegetables and stir-fry for 5-7 minutes until crisp-tender.\n4. Season with soy sauce and serve hot.",
-            tags: ["quick", "vegetarian", "healthy"]
-        },
-        {
-            id: 2,
-            title: "Creamy Chicken Pasta",
-            image: "https://images.unsplash.com/photo-1563379926898-05f4575a45d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
-            time: 35,
-            servings: 4,
-            difficulty: 'medium',
-            ingredients: ["chicken", "garlic", "onion", "cheese"],
-            instructions: "1. Cook pasta according to package directions.\n2. Sauté chicken with garlic and onion until cooked through.\n3. Add cream and cheese, simmer until sauce thickens.\n4. Combine with pasta and serve.",
-            tags: ["creamy", "comfort food"]
-        },
-        {
-            id: 3,
-            title: "Fresh Tomato Bruschetta",
-            image: "https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80",
-            time: 15,
-            servings: 4,
-            difficulty: 'easy',
-            ingredients: ["tomato", "garlic", "onion"],
-            instructions: "1. Dice tomatoes and combine with minced garlic and onion.\n2. Add olive oil, salt, and basil.\n3. Spoon mixture onto toasted bread slices.\n4. Serve immediately.",
-            tags: ["quick", "appetizer", "vegetarian"]
-        }
-    ];
-    
-    const matchingRecipes = recipeTemplates.filter(recipe => {
-        return ingredients.some(ingredient => 
-            recipe.ingredients.includes(ingredient)
-        );
-    });
-    
-    if (matchingRecipes.length === 0) {
-        return recipeTemplates.slice(0, 3);
-    }
-    
-    return matchingRecipes.slice(0, 6);
-}
-
 function renderRecipes(recipes) {
     recipesContainer.innerHTML = '';
     
     if (recipes.length === 0) {
-        recipesContainer.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><h3>No recipes found</h3><p>Try adding different ingredients or changing filters!</p></div>';
+        recipesContainer.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-search"></i>
+                <h3>No recipes found</h3>
+                <p>Try adding different ingredients or changing filters!</p>
+            </div>
+        `;
         document.getElementById('results-count').textContent = '0 recipes found';
         return;
     }
@@ -737,13 +1094,19 @@ function renderRecipes(recipes) {
     
     recipes.forEach((recipe, index) => {
         const isSaved = savedRecipes.some(saved => saved.id === recipe.id);
-        const matchingIngredients = recipe.ingredients.filter(ing => ingredients.includes(ing));
+        const matchingIngredients = recipe.ingredients.filter(ing => 
+            ingredients.some(userIng => 
+                ing.toLowerCase().includes(userIng.toLowerCase()) || 
+                userIng.toLowerCase().includes(ing.toLowerCase())
+            )
+        );
         
         const card = document.createElement('div');
         card.className = 'recipe-card';
         card.innerHTML = `
-            ${matchingIngredients.length === recipe.ingredients.length ? '<div class="recipe-badge">All Ingredients Match!</div>' : ''}
-            <img src="${recipe.image}" alt="${recipe.title}" class="recipe-image">
+            ${matchingIngredients.length >= 2 ? '<div class="recipe-badge">Great Match!</div>' : ''}
+            ${recipe.source ? `<div class="source-badge">${recipe.source}</div>` : ''}
+            <img src="${recipe.image}" alt="${recipe.title}" class="recipe-image" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'">
             <div class="recipe-content">
                 <h3 class="recipe-title">${recipe.title}</h3>
                 <div class="recipe-info">
@@ -753,11 +1116,11 @@ function renderRecipes(recipes) {
                 </div>
                 <div class="recipe-ingredients">
                     <div class="ingredient-pills">
-                        ${recipe.ingredients.slice(0, 5).map(ing => `
-                            <span class="ingredient-pill ${ingredients.includes(ing) ? 'matched' : ''}" 
-                                  data-ingredient="${ing}">${ing}</span>
+                        ${recipe.ingredients.slice(0, 4).map(ing => `
+                            <span class="ingredient-pill ${ingredients.some(userIng => ing.toLowerCase().includes(userIng.toLowerCase())) ? 'matched' : ''}" 
+                                  title="${ing}">${ing.length > 20 ? ing.substring(0, 20) + '...' : ing}</span>
                         `).join('')}
-                        ${recipe.ingredients.length > 5 ? `<span class="ingredient-pill">+${recipe.ingredients.length - 5} more</span>` : ''}
+                        ${recipe.ingredients.length > 4 ? `<span class="ingredient-pill">+${recipe.ingredients.length - 4} more</span>` : ''}
                     </div>
                 </div>
                 <div class="recipe-actions">
@@ -791,7 +1154,7 @@ function renderRecipes(recipes) {
     document.querySelectorAll('.ingredient-pill').forEach(pill => {
         pill.addEventListener('click', function(e) {
             e.stopPropagation();
-            const ingredient = this.getAttribute('data-ingredient');
+            const ingredient = this.getAttribute('title');
             if (ingredient && !ingredients.includes(ingredient)) {
                 ingredients.push(ingredient);
                 renderIngredients();
@@ -813,13 +1176,14 @@ function showRecipeDetail(recipe) {
     modalContent.innerHTML = `
         <div class="recipe-detail">
             <div class="detail-header">
-                <img src="${recipe.image}" alt="${recipe.title}" class="detail-image">
+                <img src="${recipe.image}" alt="${recipe.title}" class="detail-image" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'">
                 <div class="detail-info">
                     <h2>${recipe.title}</h2>
                     <div class="detail-meta">
                         <span><i class="far fa-clock"></i> ${recipe.time} minutes</span>
                         <span><i class="fas fa-user-friends"></i> ${recipe.servings} servings</span>
                         <span><i class="fas fa-signal"></i> ${recipe.difficulty}</span>
+                        ${recipe.source ? `<span><i class="fas fa-database"></i> ${recipe.source}</span>` : ''}
                     </div>
                     <div class="detail-actions">
                         <button class="btn-primary" id="start-cooking">
@@ -829,6 +1193,11 @@ function showRecipeDetail(recipe) {
                             <i class="${isSaved ? 'fas' : 'far'} fa-bookmark"></i> 
                             ${isSaved ? 'Saved' : 'Save Recipe'}
                         </button>
+                        ${recipe.sourceUrl ? `
+                        <a href="${recipe.sourceUrl}" target="_blank" class="btn-secondary">
+                            <i class="fas fa-external-link-alt"></i> Original Recipe
+                        </a>
+                        ` : ''}
                     </div>
                 </div>
             </div>
@@ -837,8 +1206,8 @@ function showRecipeDetail(recipe) {
                     <h3>Ingredients</h3>
                     <ul>
                         ${recipe.ingredients.map(ing => `
-                            <li class="${ingredients.includes(ing) ? 'available' : ''}">
-                                ${ing} ${ingredients.includes(ing) ? '✓' : ''}
+                            <li class="${ingredients.some(userIng => ing.toLowerCase().includes(userIng.toLowerCase())) ? 'available' : ''}">
+                                ${ing} ${ingredients.some(userIng => ing.toLowerCase().includes(userIng.toLowerCase())) ? '✓' : ''}
                             </li>
                         `).join('')}
                     </ul>
@@ -846,12 +1215,18 @@ function showRecipeDetail(recipe) {
                 <div class="instructions-section">
                     <h3>Instructions</h3>
                     <div class="instructions-steps">
-                        ${recipe.instructions.split('\n').map(step => `
-                            <div class="instruction-step">
-                                <span class="step-number">${step.split('.')[0]}</span>
-                                <span class="step-text">${step.split('.').slice(1).join('.')}</span>
-                            </div>
-                        `).join('')}
+                        ${recipe.instructions && recipe.instructions !== 'No instructions available.' ? 
+                            recipe.instructions.split('\n').filter(step => step.trim()).map((step, index) => `
+                                <div class="instruction-step">
+                                    <span class="step-number">${index + 1}</span>
+                                    <span class="step-text">${step.trim()}</span>
+                                </div>
+                            `).join('') : 
+                            `<div class="no-instructions">
+                                <p>No detailed instructions available from the API.</p>
+                                ${recipe.sourceUrl ? `<p>Please visit the <a href="${recipe.sourceUrl}" target="_blank">original recipe website</a> for complete instructions.</p>` : ''}
+                            </div>`
+                        }
                     </div>
                 </div>
             </div>
@@ -985,7 +1360,8 @@ function renderSavedRecipes() {
         const card = document.createElement('div');
         card.className = 'recipe-card';
         card.innerHTML = `
-            <img src="${recipe.image}" alt="${recipe.title}" class="recipe-image">
+            ${recipe.source ? `<div class="source-badge">${recipe.source}</div>` : ''}
+            <img src="${recipe.image}" alt="${recipe.title}" class="recipe-image" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'">
             <div class="recipe-content">
                 <h3 class="recipe-title">${recipe.title}</h3>
                 <div class="recipe-info">

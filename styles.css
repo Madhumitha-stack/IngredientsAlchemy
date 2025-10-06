@@ -244,6 +244,7 @@ body::before {
 .nav-actions {
     display: flex;
     gap: 10px;
+    align-items: center;
 }
 
 .nav-btn {
@@ -258,12 +259,24 @@ body::before {
     cursor: pointer;
     transition: var(--transition);
     color: var(--text);
+    font-size: 1rem;
 }
 
 .nav-btn:hover {
     background: var(--primary);
     color: white;
     transform: scale(1.1);
+}
+
+/* Mobile Menu Toggle */
+.mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 5px;
 }
 
 /* Pages */
@@ -414,6 +427,12 @@ body::before {
     color: var(--text);
     cursor: pointer;
     transition: var(--transition);
+    font-size: 1.1rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .voice-btn:hover {
@@ -436,6 +455,7 @@ body::before {
     display: flex;
     align-items: center;
     gap: 8px;
+    font-size: 1rem;
 }
 
 .btn-primary:hover {
@@ -455,6 +475,7 @@ body::before {
     display: flex;
     align-items: center;
     gap: 8px;
+    font-size: 1rem;
 }
 
 .btn-secondary:hover {
@@ -1328,6 +1349,12 @@ body::before {
         margin-right: 8px;
     }
     
+    /* Mobile Menu Toggle */
+    .mobile-menu-toggle {
+        display: block;
+        z-index: 101;
+    }
+    
     .nav-menu {
         position: fixed;
         top: 60px;
@@ -1342,6 +1369,7 @@ body::before {
         padding-top: 40px;
         transition: left 0.3s ease;
         z-index: 99;
+        box-shadow: 0 5px 15px var(--shadow);
     }
     
     .nav-menu.active {
@@ -1357,17 +1385,35 @@ body::before {
     }
     
     .nav-actions {
+        position: static;
+        flex-direction: row;
         gap: 8px;
+        margin-top: 20px;
     }
     
     .nav-btn {
-        width: 36px;
-        height: 36px;
+        width: 44px;
+        height: 44px;
+        font-size: 1.1rem;
     }
     
     .theme-toggle {
         top: 15px;
-        right: 15px;
+        right: 60px;
+    }
+    
+    .theme-label {
+        width: 50px;
+        height: 26px;
+    }
+    
+    .theme-ball {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .theme-switch:checked + .theme-label .theme-ball {
+        transform: translateX(24px);
     }
 }
 
@@ -1436,12 +1482,21 @@ body::before {
     #ingredient-input {
         padding: 12px 20px;
         border-radius: 15px 15px 0 0;
+        font-size: 1rem;
+    }
+    
+    .voice-btn {
+        right: 8px;
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
     }
     
     .btn-primary {
         padding: 12px 20px;
         border-radius: 0 0 15px 15px;
         justify-content: center;
+        font-size: 1rem;
     }
     
     .search-actions {
@@ -1452,6 +1507,17 @@ body::before {
     .btn-large, .btn-secondary {
         width: 100%;
         justify-content: center;
+        font-size: 1rem;
+        padding: 12px 20px;
+    }
+    
+    .ingredients-list {
+        margin: 15px 0;
+    }
+    
+    .ingredient-tag {
+        font-size: 0.9rem;
+        padding: 6px 12px;
     }
 }
 
@@ -1498,6 +1564,11 @@ body::before {
         gap: 15px;
     }
     
+    .sort-options select {
+        width: 100%;
+        max-width: 200px;
+    }
+    
     .recipes-container {
         grid-template-columns: 1fr;
         gap: 20px;
@@ -1505,6 +1576,16 @@ body::before {
     
     .recipe-card {
         margin: 0 10px;
+    }
+    
+    .recipe-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .btn-view, .btn-save {
+        width: 100%;
+        justify-content: center;
     }
 }
 
@@ -1561,6 +1642,10 @@ body::before {
         max-width: 90%;
     }
     
+    .timer-display {
+        font-size: 2.5rem;
+    }
+    
     .timer-controls {
         flex-wrap: wrap;
     }
@@ -1572,6 +1657,12 @@ body::before {
     .timer-preset {
         padding: 6px 12px;
         font-size: 0.9rem;
+    }
+    
+    .close-modal {
+        top: 10px;
+        right: 15px;
+        font-size: 1.3rem;
     }
 }
 
@@ -1608,11 +1699,15 @@ body::before {
 /* Small Mobile Devices */
 @media (max-width: 480px) {
     .page {
-        padding: 30px 10px;
+        padding: 20px 10px;
     }
     
     .nav-logo {
         font-size: 1.1rem;
+    }
+    
+    .nav-logo i {
+        font-size: 1.3rem;
     }
     
     .hero-title {
@@ -1624,15 +1719,20 @@ body::before {
         padding: 15px;
     }
     
-    .ingredient-tag {
-        font-size: 0.9rem;
-        padding: 6px 12px;
-    }
-    
     .notification {
         right: 10px;
         left: 10px;
         max-width: none;
+        padding: 12px 20px;
+    }
+    
+    .loading-spinner {
+        gap: 8px;
+    }
+    
+    .spinner-circle {
+        width: 16px;
+        height: 16px;
     }
 }
 
@@ -1666,6 +1766,18 @@ body::before {
         transform: none;
         animation-play-state: running;
     }
+    
+    /* Add active states for touch devices */
+    .nav-btn:active,
+    .tip-btn:active,
+    .filter-btn:active,
+    .btn-primary:active,
+    .btn-secondary:active,
+    .btn-large:active,
+    .btn-view:active,
+    .btn-save:active {
+        transform: scale(0.95);
+    }
 }
 
 /* High DPI Screens */
@@ -1685,7 +1797,8 @@ body::before {
     .floating-ingredients,
     .animated-bg,
     .search-actions .btn-secondary,
-    .recipe-actions .btn-save {
+    .recipe-actions .btn-save,
+    .mobile-menu-toggle {
         display: none !important;
     }
     
@@ -1698,5 +1811,42 @@ body::before {
         break-inside: avoid;
         box-shadow: none !important;
         border: 1px solid #ccc;
+    }
+}
+
+/* Ensure all interactive elements are properly sized for mobile */
+@media (max-width: 768px) {
+    /* Make sure all buttons are easily tappable */
+    button, 
+    .nav-btn, 
+    .tip-btn, 
+    .filter-btn, 
+    .btn-primary, 
+    .btn-secondary, 
+    .btn-large, 
+    .btn-view, 
+    .btn-save,
+    .timer-preset {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    /* Ensure form elements are properly sized */
+    input, select, textarea {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    /* Improve touch targets */
+    .ingredient-pill {
+        padding: 8px 12px;
+        min-height: 32px;
+    }
+    
+    .floating-item {
+        min-width: 44px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 }
