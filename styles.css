@@ -277,6 +277,7 @@ body::before {
     font-size: 1.5rem;
     cursor: pointer;
     padding: 5px;
+    z-index: 101;
 }
 
 /* Pages */
@@ -1331,17 +1332,19 @@ body::before {
     }
 }
 
-/* ========== MOBILE RESPONSIVE STYLES ========== */
+/* ========== IMPROVED MOBILE RESPONSIVE STYLES ========== */
 
-/* Mobile Navigation */
+/* Mobile Navigation - Fixed */
 @media (max-width: 768px) {
     .nav-container {
         padding: 0 15px;
         height: 60px;
+        position: relative;
     }
     
     .nav-logo {
         font-size: 1.2rem;
+        z-index: 102;
     }
     
     .nav-logo i {
@@ -1349,27 +1352,41 @@ body::before {
         margin-right: 8px;
     }
     
-    /* Mobile Menu Toggle */
+    /* Mobile Menu Toggle - Fixed */
     .mobile-menu-toggle {
         display: block;
-        z-index: 101;
+        z-index: 102;
+        background: var(--light);
+        border-radius: 50%;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition);
+    }
+    
+    .mobile-menu-toggle.active {
+        background: var(--primary);
+        color: white;
     }
     
     .nav-menu {
         position: fixed;
-        top: 60px;
+        top: 0;
         left: -100%;
         width: 100%;
-        height: calc(100vh - 60px);
+        height: 100vh;
         background: var(--card-bg);
-        backdrop-filter: blur(10px);
+        backdrop-filter: blur(20px);
         flex-direction: column;
         align-items: center;
         justify-content: flex-start;
-        padding-top: 40px;
+        padding-top: 80px;
         transition: left 0.3s ease;
         z-index: 99;
         box-shadow: 0 5px 15px var(--shadow);
+        overflow-y: auto;
     }
     
     .nav-menu.active {
@@ -1380,26 +1397,37 @@ body::before {
         margin: 0;
         width: 100%;
         text-align: center;
-        padding: 15px 0;
+        padding: 20px 0;
         border-bottom: 1px solid var(--shadow);
     }
     
+    .nav-link {
+        font-size: 1.1rem;
+        padding: 12px 0;
+        display: block;
+        width: 100%;
+    }
+    
     .nav-actions {
-        position: static;
+        position: absolute;
+        bottom: 40px;
+        left: 0;
+        right: 0;
         flex-direction: row;
-        gap: 8px;
-        margin-top: 20px;
+        gap: 15px;
+        justify-content: center;
+        padding: 0 20px;
     }
     
     .nav-btn {
-        width: 44px;
-        height: 44px;
-        font-size: 1.1rem;
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
     }
     
     .theme-toggle {
-        top: 15px;
-        right: 60px;
+        top: 18px;
+        right: 70px;
     }
     
     .theme-label {
@@ -1415,17 +1443,22 @@ body::before {
     .theme-switch:checked + .theme-label .theme-ball {
         transform: translateX(24px);
     }
+    
+    /* Prevent body scroll when menu is open */
+    body.menu-open {
+        overflow: hidden;
+    }
 }
 
 /* Mobile Hero Section */
 @media (max-width: 768px) {
     .hero {
-        padding: 40px 15px;
+        padding: 30px 15px;
     }
     
     .hero-content {
         grid-template-columns: 1fr;
-        gap: 40px;
+        gap: 30px;
     }
     
     .hero-text {
@@ -1440,6 +1473,7 @@ body::before {
     .hero-subtitle {
         font-size: 1.1rem;
         margin-bottom: 30px;
+        padding: 0 10px;
     }
     
     .stats-container {
@@ -1458,6 +1492,7 @@ body::before {
     .search-container {
         padding: 20px;
         margin: 0 15px;
+        border-radius: 15px;
     }
     
     .search-header h3 {
@@ -1477,47 +1512,51 @@ body::before {
     .search-box {
         flex-direction: column;
         border-radius: 15px;
+        overflow: hidden;
     }
     
     #ingredient-input {
-        padding: 12px 20px;
+        padding: 15px 20px;
         border-radius: 15px 15px 0 0;
         font-size: 1rem;
     }
     
     .voice-btn {
-        right: 8px;
-        width: 36px;
-        height: 36px;
-        font-size: 1rem;
+        right: 15px;
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
     }
     
     .btn-primary {
-        padding: 12px 20px;
+        padding: 15px 20px;
         border-radius: 0 0 15px 15px;
         justify-content: center;
         font-size: 1rem;
+        width: 100%;
     }
     
     .search-actions {
         flex-direction: column;
         gap: 10px;
+        width: 100%;
     }
     
     .btn-large, .btn-secondary {
         width: 100%;
         justify-content: center;
         font-size: 1rem;
-        padding: 12px 20px;
+        padding: 15px 20px;
     }
     
     .ingredients-list {
         margin: 15px 0;
+        justify-content: center;
     }
     
     .ingredient-tag {
         font-size: 0.9rem;
-        padding: 6px 12px;
+        padding: 8px 15px;
     }
 }
 
@@ -1526,6 +1565,7 @@ body::before {
     .filters-section {
         margin: 30px 15px;
         padding: 15px;
+        border-radius: 15px;
     }
     
     .filters-content {
@@ -1535,11 +1575,13 @@ body::before {
     
     .time-filters, .difficulty-filters {
         justify-content: center;
+        gap: 8px;
     }
     
     .filter-btn {
         font-size: 0.8rem;
-        padding: 6px 12px;
+        padding: 8px 15px;
+        min-height: 40px;
     }
 }
 
@@ -1557,16 +1599,23 @@ body::before {
     
     .section-title {
         font-size: 2rem;
+        line-height: 1.3;
     }
     
     .results-info {
         flex-direction: column;
         gap: 15px;
+        width: 100%;
+    }
+    
+    .sort-options {
+        width: 100%;
     }
     
     .sort-options select {
         width: 100%;
-        max-width: 200px;
+        max-width: none;
+        padding: 12px 15px;
     }
     
     .recipes-container {
@@ -1575,7 +1624,7 @@ body::before {
     }
     
     .recipe-card {
-        margin: 0 10px;
+        margin: 0;
     }
     
     .recipe-actions {
@@ -1586,6 +1635,8 @@ body::before {
     .btn-view, .btn-save {
         width: 100%;
         justify-content: center;
+        padding: 12px 15px;
+        font-size: 1rem;
     }
 }
 
@@ -1597,6 +1648,7 @@ body::before {
     
     .filter-category {
         padding: 20px;
+        border-radius: 12px;
     }
     
     .filter-category h3 {
@@ -1605,10 +1657,13 @@ body::before {
     
     .filter-actions {
         flex-direction: column;
+        width: 100%;
     }
     
     .filter-actions button {
         width: 100%;
+        padding: 15px 20px;
+        font-size: 1rem;
     }
 }
 
@@ -1628,18 +1683,32 @@ body::before {
     .saved-recipes-container {
         padding: 0 15px;
     }
+    
+    .empty-state {
+        padding: 40px 20px;
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+    }
+    
+    .empty-state h3 {
+        font-size: 1.3rem;
+    }
 }
 
 /* Mobile Modals */
 @media (max-width: 768px) {
     .modal-content {
         margin: 20px auto;
-        padding: 20px;
+        padding: 20px 15px;
         width: 95%;
+        border-radius: 12px;
     }
     
     .timer-modal {
         max-width: 90%;
+        padding: 20px;
     }
     
     .timer-display {
@@ -1648,6 +1717,7 @@ body::before {
     
     .timer-controls {
         flex-wrap: wrap;
+        gap: 8px;
     }
     
     .timer-presets {
@@ -1655,14 +1725,20 @@ body::before {
     }
     
     .timer-preset {
-        padding: 6px 12px;
+        padding: 8px 15px;
         font-size: 0.9rem;
+        min-height: 44px;
     }
     
     .close-modal {
         top: 10px;
         right: 15px;
         font-size: 1.3rem;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 }
 
@@ -1670,7 +1746,12 @@ body::before {
 @media (max-width: 768px) {
     .floating-item {
         font-size: 1.5rem;
-        opacity: 0.2;
+        opacity: 0.15;
+        min-width: 44px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
     /* Reposition floating items for mobile */
@@ -1724,6 +1805,7 @@ body::before {
         left: 10px;
         max-width: none;
         padding: 12px 20px;
+        font-size: 0.9rem;
     }
     
     .loading-spinner {
@@ -1733,6 +1815,10 @@ body::before {
     .spinner-circle {
         width: 16px;
         height: 16px;
+    }
+    
+    .section-title {
+        font-size: 1.8rem;
     }
 }
 
@@ -1775,8 +1861,15 @@ body::before {
     .btn-secondary:active,
     .btn-large:active,
     .btn-view:active,
-    .btn-save:active {
+    .btn-save:active,
+    .timer-preset:active {
         transform: scale(0.95);
+    }
+    
+    /* Improve touch feedback */
+    .nav-link:active,
+    .ingredient-pill:active {
+        opacity: 0.7;
     }
 }
 
@@ -1848,5 +1941,24 @@ body::before {
         display: flex;
         align-items: center;
         justify-content: center;
+    }
+    
+    /* Better spacing for mobile */
+    .page {
+        padding: 20px 15px;
+    }
+    
+    /* Improve card layouts */
+    .recipe-content {
+        padding: 15px;
+    }
+    
+    .recipe-title {
+        font-size: 1.2rem;
+    }
+    
+    /* Better form controls */
+    select, input {
+        padding: 12px 15px;
     }
 }
